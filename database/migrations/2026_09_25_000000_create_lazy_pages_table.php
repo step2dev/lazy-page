@@ -11,7 +11,8 @@ return new class extends Migration
         $pages = (string) config('lazy-page.tables.pages', 'lazy_pages');
         $translations = (string) config('lazy-page.tables.translations', 'lazy_page_translations');
 
-        Schema::create($pages, function (Blueprint $table) use ($pages): void {
+        if (! Schema::hasTable($pages)) {
+            Schema::create($pages, function (Blueprint $table) use ($pages): void {
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained($pages)->nullOnDelete();
             $table->string('key')->nullable()->unique();
@@ -23,10 +24,12 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable()->index();
             $table->unsignedInteger('position')->default(0)->index();
             $table->timestamps();
-            $table->softDeletes();
-        });
+                $table->softDeletes();
+            });
+        }
 
-        Schema::create($translations, function (Blueprint $table) use ($pages): void {
+        if (! Schema::hasTable($translations)) {
+            Schema::create($translations, function (Blueprint $table) use ($pages): void {
             $table->id();
             $table->foreignId('page_id')->constrained($pages)->cascadeOnDelete();
             $table->string('locale', 10)->index();
@@ -35,8 +38,9 @@ return new class extends Migration
             $table->longText('content')->nullable();
             $table->timestamps();
 
-            $table->unique(['page_id', 'locale']);
-        });
+                $table->unique(['page_id', 'locale']);
+            });
+        }
     }
 
     public function down(): void
