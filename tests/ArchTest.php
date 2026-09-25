@@ -1,5 +1,5 @@
 <?php
 
-arch('it will not use debugging functions')
-    ->expect(['dd', 'dump', 'ray'])
-    ->each->not->toBeUsed();
+arch('source does not depend on application namespaces')
+    ->expect('Step2dev\\LazyPage')
+    ->not->toUse('App\\');

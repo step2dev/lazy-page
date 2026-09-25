@@ -1,10 +1,10 @@
 <?php
 
-namespace VendorName\Skeleton\Tests;
+namespace Step2dev\LazyPage\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use VendorName\Skeleton\SkeletonServiceProvider;
+use Step2dev\LazyPage\LazyPageServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -13,25 +13,32 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'VendorName\\Skeleton\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName): string => 'Step2dev\\LazyPage\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
+
+        (include __DIR__.'/../database/migrations/2026_09_25_000000_create_lazy_pages_table.php')->up();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
-            SkeletonServiceProvider::class,
+            LazyPageServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
+        config()->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
 
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/../database/migrations') as $migration) {
-            (include $migration->getRealPath())->up();
-         }
-         */
+        config()->set('app.locale', 'en');
+        config()->set('app.fallback_locale', 'en');
+        config()->set('translatable.locales', ['en', 'uk', 'pl', 'ru']);
+        config()->set('translatable.fallback_locale', 'en');
+        config()->set('lazy-page.cache.enabled', false);
     }
 }
