@@ -28,6 +28,7 @@ class LazyPageServiceProvider extends PackageServiceProvider
             ->hasMigrations([
                 '2026_09_25_000000_create_lazy_pages_table',
             ])
+            ->runsMigrations()
             ->hasCommand(ImportLegacyPagesCommand::class);
     }
 
